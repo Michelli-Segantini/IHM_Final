@@ -1,3 +1,5 @@
+Claude
+Biblioteca redesign · HTML
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -31,7 +33,7 @@
     background: var(--bg);
   }
   .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
-
+ 
   .proto-banner {
     background: #20263a; color: #fff; font-size: .85rem;
     padding: 8px 16px; text-align: center;
@@ -39,9 +41,9 @@
   .app-header { background: var(--primary); color: #fff; padding: 16px 0 18px; }
   .brand { margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: uppercase; opacity: .9; }
   h1 { margin: 2px 0 0; font-size: 1.6rem; line-height: 1.2; }
-
+ 
   main.wrap { padding-top: 24px; padding-bottom: 48px; }
-
+ 
   form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
   label, legend { display: block; font-weight: 600; margin-bottom: 6px; }
   .field { margin-bottom: 16px; }
@@ -55,7 +57,7 @@
   .hint { margin: 4px 0 0; font-size: .9rem; color: var(--muted); }
   .error-msg { margin: 6px 0 0; padding: 8px 10px; background: var(--err-bg); color: var(--err-text); border-radius: 6px; font-weight: 600; }
   input[aria-invalid="true"] { border-color: var(--err-text); }
-
+ 
   fieldset { border: 0; padding: 0; margin: 0 0 16px; }
   .seg { display: flex; flex-wrap: wrap; gap: 8px; }
   .seg label { margin: 0; font-weight: 500; }
@@ -66,7 +68,7 @@
   }
   .seg input:checked + span { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
   .seg input:focus-visible + span { outline: 3px solid #ffbf47; outline-offset: 2px; }
-
+ 
   .btn-primary {
     width: 100%; min-height: 48px; border: 0; border-radius: 8px; font: inherit; font-weight: 700;
     background: var(--primary); color: #fff; cursor: pointer;
@@ -75,7 +77,7 @@
   button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
     outline: 3px solid #ffbf47; outline-offset: 2px;
   }
-
+ 
   .examples { margin: 14px 0 0; font-size: .9rem; color: var(--muted); }
   .chip {
     font: inherit; margin: 0 4px 0 2px; min-height: 40px; padding: 8px 6px;
@@ -83,11 +85,11 @@
     text-decoration: underline; text-underline-offset: 3px;
   }
   .chip:hover { color: var(--primary-dark); }
-
+ 
   #summary { margin: 24px 0 10px; font-weight: 600; scroll-margin-top: 12px; }
   #summary:focus { outline: none; }
   #summary.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px; font-weight: 500; }
-
+ 
   ul.results { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
   .card h3 { margin: 0; font-size: 1rem; }
@@ -107,38 +109,53 @@
   }
   .card-toggle[aria-expanded="true"] .chev { transform: rotate(-135deg); top: 26px; }
   @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
-
+ 
   .badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: .88rem; font-weight: 700; }
   .badge.ok { background: var(--ok-bg); color: var(--ok-text); }
   .badge.warn { background: var(--warn-bg); color: var(--warn-text); }
   .badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
   .badge.warn::before { border-radius: 2px; }
-
+ 
   .details { border-top: 1px solid var(--line); padding: 12px 14px 16px; background: #fbfcfe; }
   dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 8px; }
   dl div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 8px; }
   dt { color: var(--muted); font-weight: 600; }
   dd { margin: 0; overflow-wrap: anywhere; }
   @media (max-width: 420px) { dl div { grid-template-columns: 1fr; gap: 0; } }
-
+ 
   .tech { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
   .tech summary { cursor: pointer; font-weight: 600; color: var(--primary); min-height: 40px; display: flex; align-items: center; }
   .tech dl { margin-top: 8px; }
   .tag-ex { display: inline-block; margin-left: 6px; font-size: .75rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
-
+ 
   #more { margin-top: 14px; width: 100%; min-height: 48px; font: inherit; font-weight: 600; background: #fff; color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; cursor: pointer; }
   #more[hidden] { display: none; }
+ 
+  #top {
+    position: fixed; right: 16px; bottom: 16px; z-index: 10;
+    width: 52px; height: 52px; padding: 0; border: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary); color: #fff; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    visibility: hidden; opacity: 0; transition: opacity .15s, visibility .15s;
+  }
+  #top.show { visibility: visible; opacity: 1; }
+  #top:hover { background: var(--primary-dark); }
+  #top svg { width: 26px; height: 26px; }
+  @media (prefers-reduced-motion: reduce) { #top { transition: none; } }
 </style>
 </head>
 <body>
-
+ 
+<div class="proto-banner" role="note">Protótipo acadêmico de redesign (FAM – Interface Homem-Máquina). Não é o sistema oficial. Dados de exemplo.</div>
+ 
 <header class="app-header">
   <div class="wrap">
     <p class="brand">Biblioteca</p>
     <h1>Consulta de livros</h1>
   </div>
 </header>
-
+ 
 <main class="wrap">
   <form id="form" role="search" novalidate>
     <div class="field">
@@ -147,7 +164,7 @@
       <p id="q-hint" class="hint">Digite uma palavra do título, do autor ou do assunto.</p>
       <p id="q-error" class="error-msg" hidden></p>
     </div>
-
+ 
     <div class="field">
       <label for="campo">Buscar por<span class="req" aria-hidden="true"> *</span></label>
       <select id="campo" name="campo" aria-required="true">
@@ -158,7 +175,7 @@
         <option value="colecao">Coleção</option>
       </select>
     </div>
-
+ 
     <div class="field">
       <label for="bib">Biblioteca<span class="req" aria-hidden="true"> *</span></label>
       <select id="bib" aria-required="true">
@@ -166,7 +183,7 @@
         <option value="Central">Central</option>
       </select>
     </div>
-
+ 
     <button class="btn-primary" id="go" type="button">Pesquisar</button>
     <p class="examples">Exemplos:
       <button type="button" class="chip" data-q="python">python</button>
@@ -174,15 +191,19 @@
     </p>
     <p class="legend"><span class="req" aria-hidden="true">*</span> Campo obrigatório</p>
   </form>
-
+ 
   <p id="summary" class="empty" aria-live="polite" tabindex="-1">Digite um título, autor ou assunto e toque em Pesquisar.</p>
   <ul id="results" class="results"></ul>
   <button id="more" type="button" hidden></button>
 </main>
-
+ 
+<button id="top" type="button" aria-label="Voltar ao topo" title="Voltar ao topo">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+ 
 <script>
   var PAGE = 3;
-
+ 
   var LIVROS = [
     { id: 1, titulo: "Python para análise de dados", autor: "McKinney, Wes", editora: "Novatec",
       assunto: "Informática - Banco de Dados", colecao: "Sem coleção", status: "Disponível",
@@ -210,9 +231,9 @@
       localizacao: "Pesquisa", biblioteca: "Central", tombo: "—", classificacao: "—",
       identificacao: "—", volume: "—", tomo: "—", exemplar: "1", exemplo: true }
   ];
-
+ 
   var state = { matches: [], shown: 0, q: "", campo: "titulo", bib: "todas" };
-
+ 
   var form = document.getElementById("form");
   var qInput = document.getElementById("q");
   var qError = document.getElementById("q-error");
@@ -220,7 +241,7 @@
   var summary = document.getElementById("summary");
   var list = document.getElementById("results");
   var moreBtn = document.getElementById("more");
-
+ 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -232,7 +253,7 @@
   function row(dt, dd) {
     return "<div><dt>" + esc(dt) + "</dt><dd>" + esc(dd) + "</dd></div>";
   }
-
+ 
   function card(l) {
     var ok = l.status === "Disponível";
     var statusRows = row("Status", l.status) + (l.devolucao ? row("Devolução prevista", l.devolucao) : "");
@@ -255,7 +276,7 @@
           row("Tomo", l.tomo) + row("Exemplar", l.exemplar) + '</dl></details>' +
       '</div></article></li>';
   }
-
+ 
   function render() {
     var total = state.matches.length;
     var items = state.matches.slice(0, state.shown);
@@ -269,7 +290,7 @@
       panel.hidden = false;
       list.querySelector('[aria-controls="' + id + '"]').setAttribute("aria-expanded", "true");
     });
-
+ 
     var where = state.bib === "todas" ? "em todas as bibliotecas" : "na biblioteca " + state.bib;
     if (total === 0) {
       summary.className = "empty";
@@ -280,7 +301,7 @@
       summary.textContent = total + (total === 1 ? " resultado" : " resultados") + " para “" + state.q + "” " + where +
         ". Mostrando " + items.length + " de " + total + ".";
     }
-
+ 
     var left = total - items.length;
     if (left > 0) {
       moreBtn.hidden = false;
@@ -289,7 +310,7 @@
       moreBtn.hidden = true;
     }
   }
-
+ 
   function search() {
     var q = qInput.value.trim();
     if (!q) {
@@ -301,7 +322,7 @@
     }
     qInput.removeAttribute("aria-invalid");
     qError.hidden = true;
-
+ 
     state.q = q;
     state.campo = form.elements.campo.value;
     state.bib = bibSel.value;
@@ -315,20 +336,20 @@
     render();
     goToResults();
   }
-
+ 
   function goToResults() {
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     summary.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     summary.focus({ preventScroll: true });
   }
-
+ 
   // A busca não depende do envio do formulário (alguns visualizadores o bloqueiam).
   form.addEventListener("submit", function (e) { e.preventDefault(); });
   document.getElementById("go").addEventListener("click", search);
   qInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") { e.preventDefault(); search(); }
   });
-
+ 
   document.querySelectorAll(".chip").forEach(function (b) {
     b.addEventListener("click", function () {
       qInput.value = b.getAttribute("data-q");
@@ -336,12 +357,12 @@
       search();
     });
   });
-
+ 
   moreBtn.addEventListener("click", function () {
     state.shown = Math.min(state.shown + PAGE, state.matches.length);
     render();
   });
-
+ 
   list.addEventListener("click", function (e) {
     var btn = e.target.closest(".card-toggle");
     if (!btn) return;
@@ -349,6 +370,21 @@
     var open = btn.getAttribute("aria-expanded") === "true";
     btn.setAttribute("aria-expanded", open ? "false" : "true");
     panel.hidden = open;
+  });
+  // Botão "Voltar ao topo": aparece depois de rolar a página.
+  var topBtn = document.getElementById("top");
+  function toggleTop() {
+    var y = window.pageYOffset || document.documentElement.scrollTop;
+    topBtn.classList.toggle("show", y > 300);
+  }
+  window.addEventListener("scroll", toggleTop, { passive: true });
+  toggleTop();
+  topBtn.addEventListener("click", function () {
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    var h = document.querySelector("h1");
+    h.setAttribute("tabindex", "-1");
+    h.focus({ preventScroll: true });
   });
 </script>
 </body>
