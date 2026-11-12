@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consulta de livros – protótipo de redesign</title>
+<style>
+  :root {
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --text: #1a1f2b;
+    --muted: #4a5468;
+    --line: #d5dbe6;
+    --primary: #1d4f91;
+    --primary-dark: #153c70;
+    --ok-bg: #e3f3e8;
+    --ok-text: #0b5a27;
+    --warn-bg: #fff1d6;
+    --warn-text: #7a4300;
+    --err-bg: #fdeaea;
+    --err-text: #9b1c1c;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+  .proto-banner {
+    background: #20263a; color: #fff; font-size: .85rem;
+    padding: 8px 16px; text-align: center;
+  }
+  .app-header { background: var(--primary); color: #fff; padding: 16px 0 18px; }
+  .brand { margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: uppercase; opacity: .9; }
+  h1 { margin: 2px 0 0; font-size: 1.6rem; line-height: 1.2; }
+
+  main.wrap { padding-top: 24px; padding-bottom: 48px; }
+
+  form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  label, legend { display: block; font-weight: 600; margin-bottom: 6px; }
+  .field { margin-bottom: 16px; }
+  input[type="search"], select {
+    width: 100%; min-height: 48px; padding: 10px 12px; font: inherit;
+    border: 2px solid #8a94a8; border-radius: 8px; background: #fff; color: var(--text);
+  }
+  input[type="search"]::placeholder { color: #5d667a; }
+  .req { color: var(--err-text); font-weight: 700; }
+  .legend { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); }
+  .hint { margin: 4px 0 0; font-size: .9rem; color: var(--muted); }
+  .error-msg { margin: 6px 0 0; padding: 8px 10px; background: var(--err-bg); color: var(--err-text); border-radius: 6px; font-weight: 600; }
+  input[aria-invalid="true"] { border-color: var(--err-text); }
+
+  fieldset { border: 0; padding: 0; margin: 0 0 16px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 8px; }
+  .seg label { margin: 0; font-weight: 500; }
+  .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .seg span {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 8px 16px;
+    border: 2px solid #8a94a8; border-radius: 999px; background: #fff; cursor: pointer;
+  }
+  .seg input:checked + span { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+  .seg input:focus-visible + span { outline: 3px solid #ffbf47; outline-offset: 2px; }
+
+  .btn-primary {
+    width: 100%; min-height: 48px; border: 0; border-radius: 8px; font: inherit; font-weight: 700;
+    background: var(--primary); color: #fff; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+    outline: 3px solid #ffbf47; outline-offset: 2px;
+  }
+
+  .examples { margin: 14px 0 0; font-size: .9rem; color: var(--muted); }
+  .chip {
+    font: inherit; margin: 0 4px 0 2px; min-height: 40px; padding: 8px 6px;
+    border: 0; background: none; color: var(--primary); cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .chip:hover { color: var(--primary-dark); }
+
+  #summary { margin: 24px 0 10px; font-weight: 600; scroll-margin-top: 12px; }
+  #summary:focus { outline: none; }
+  #summary.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); padding: 14px; font-weight: 500; }
+
+  ul.results { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .card h3 { margin: 0; font-size: 1rem; }
+  .card-toggle {
+    position: relative; display: block; width: 100%; text-align: left; font: inherit; color: inherit;
+    background: none; border: 0; padding: 14px 44px 14px 14px; cursor: pointer; min-height: 48px;
+  }
+  .card-toggle:hover { background: #f0f4fb; }
+  .card-toggle .t { display: block; font-weight: 700; font-size: 1.05rem; color: var(--primary); overflow-wrap: anywhere; }
+  .card-toggle .meta { display: block; color: var(--muted); font-size: .92rem; margin-top: 2px; }
+  .card-toggle .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  .card-toggle .loc { font-size: .9rem; color: var(--muted); }
+  .chev {
+    position: absolute; right: 16px; top: 22px; width: 10px; height: 10px;
+    border-right: 3px solid var(--primary); border-bottom: 3px solid var(--primary); transform: rotate(45deg);
+    transition: transform .15s;
+  }
+  .card-toggle[aria-expanded="true"] .chev { transform: rotate(-135deg); top: 26px; }
+  @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
+
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: .88rem; font-weight: 700; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok-text); }
+  .badge.warn { background: var(--warn-bg); color: var(--warn-text); }
+  .badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .badge.warn::before { border-radius: 2px; }
+
+  .details { border-top: 1px solid var(--line); padding: 12px 14px 16px; background: #fbfcfe; }
+  dl { margin: 0; display: grid; grid-template-columns: 1fr; gap: 8px; }
+  dl div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 8px; }
+  dt { color: var(--muted); font-weight: 600; }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  @media (max-width: 420px) { dl div { grid-template-columns: 1fr; gap: 0; } }
+
+  .tech { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
+  .tech summary { cursor: pointer; font-weight: 600; color: var(--primary); min-height: 40px; display: flex; align-items: center; }
+  .tech dl { margin-top: 8px; }
+  .tag-ex { display: inline-block; margin-left: 6px; font-size: .75rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+
+  #more { margin-top: 14px; width: 100%; min-height: 48px; font: inherit; font-weight: 600; background: #fff; color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; cursor: pointer; }
+  #more[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="wrap">
+    <p class="brand">Biblioteca</p>
+    <h1>Consulta de livros</h1>
+  </div>
+</header>
+
+<main class="wrap">
+  <form id="form" role="search" novalidate>
+    <div class="field">
+      <label for="q">O que você procura?<span class="req" aria-hidden="true"> *</span></label>
+      <input id="q" type="search" autocomplete="off" aria-required="true" placeholder="Ex.: python, código civil" aria-describedby="q-hint">
+      <p id="q-hint" class="hint">Digite uma palavra do título, do autor ou do assunto.</p>
+      <p id="q-error" class="error-msg" hidden></p>
+    </div>
+
+    <div class="field">
+      <label for="campo">Buscar por<span class="req" aria-hidden="true"> *</span></label>
+      <select id="campo" name="campo" aria-required="true">
+        <option value="titulo" selected>Título</option>
+        <option value="autor">Autor</option>
+        <option value="editora">Editora</option>
+        <option value="assunto">Assunto</option>
+        <option value="colecao">Coleção</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="bib">Biblioteca<span class="req" aria-hidden="true"> *</span></label>
+      <select id="bib" aria-required="true">
+        <option value="todas">Todas</option>
+        <option value="Central">Central</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" id="go" type="button">Pesquisar</button>
+    <p class="examples">Exemplos:
+      <button type="button" class="chip" data-q="python">python</button>
+      <button type="button" class="chip" data-q="legislação">legislação</button>
+    </p>
+    <p class="legend"><span class="req" aria-hidden="true">*</span> Campo obrigatório</p>
+  </form>
+
+  <p id="summary" class="empty" aria-live="polite" tabindex="-1">Digite um título, autor ou assunto e toque em Pesquisar.</p>
+  <ul id="results" class="results"></ul>
+  <button id="more" type="button" hidden></button>
+</main>
+
+<script>
+  var PAGE = 3;
+
+  var LIVROS = [
+    { id: 1, titulo: "Python para análise de dados", autor: "McKinney, Wes", editora: "Novatec",
+      assunto: "Informática - Banco de Dados", colecao: "Sem coleção", status: "Disponível",
+      localizacao: "Pesquisa", biblioteca: "Central", tombo: "62515", classificacao: "001.6425",
+      identificacao: "M429p", volume: "0", tomo: "—", exemplar: "1" },
+    { id: 2, titulo: "A legislação trabalhista no Brasil", autor: "Munakata, Kazumi", editora: "Brasiliense",
+      assunto: "Legislação trabalhista - Brasil", colecao: "Tudo é história", status: "Disponível",
+      localizacao: "Pesquisa", biblioteca: "Central", tombo: "16964", classificacao: "347",
+      identificacao: "M928L", volume: "32", tomo: "—", exemplar: "1" },
+    { id: 3, titulo: "Código civil brasileiro e legislação complementar", autor: "Autor de exemplo", editora: "Editora de exemplo",
+      assunto: "Direito civil", colecao: "Sem coleção", status: "Disponível",
+      localizacao: "Pesquisa", biblioteca: "Central", tombo: "—", classificacao: "—",
+      identificacao: "—", volume: "—", tomo: "—", exemplar: "1", exemplo: true },
+    { id: 4, titulo: "Código de defesa do consumidor, legislação de defesa comercial e da concorrência, legislação das agências reguladoras",
+      autor: "Autor de exemplo", editora: "Editora de exemplo",
+      assunto: "Direito do consumidor", colecao: "Sem coleção", status: "Emprestado", devolucao: "20/11/2026",
+      localizacao: "Empréstimo", biblioteca: "Central", tombo: "—", classificacao: "—",
+      identificacao: "—", volume: "—", tomo: "—", exemplar: "1", exemplo: true },
+    { id: 5, titulo: "Código de processo civil e legislação processual em vigor", autor: "Autor de exemplo", editora: "Editora de exemplo",
+      assunto: "Direito processual civil", colecao: "Sem coleção", status: "Disponível",
+      localizacao: "Pesquisa", biblioteca: "Central", tombo: "—", classificacao: "—",
+      identificacao: "—", volume: "—", tomo: "—", exemplar: "1", exemplo: true },
+    { id: 6, titulo: "Código de proteção e defesa do consumidor e legislação correlata", autor: "Autor de exemplo", editora: "Editora de exemplo",
+      assunto: "Direito do consumidor", colecao: "Sem coleção", status: "Disponível",
+      localizacao: "Pesquisa", biblioteca: "Central", tombo: "—", classificacao: "—",
+      identificacao: "—", volume: "—", tomo: "—", exemplar: "1", exemplo: true }
+  ];
+
+  var state = { matches: [], shown: 0, q: "", campo: "titulo", bib: "todas" };
+
+  var form = document.getElementById("form");
+  var qInput = document.getElementById("q");
+  var qError = document.getElementById("q-error");
+  var bibSel = document.getElementById("bib");
+  var summary = document.getElementById("summary");
+  var list = document.getElementById("results");
+  var moreBtn = document.getElementById("more");
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function norm(s) {
+    return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+  function row(dt, dd) {
+    return "<div><dt>" + esc(dt) + "</dt><dd>" + esc(dd) + "</dd></div>";
+  }
+
+  function card(l) {
+    var ok = l.status === "Disponível";
+    var statusRows = row("Status", l.status) + (l.devolucao ? row("Devolução prevista", l.devolucao) : "");
+    return '<li class="card"><article>' +
+      '<h3><button type="button" class="card-toggle" aria-expanded="false" aria-controls="d' + l.id + '">' +
+        '<span class="t">' + esc(l.titulo) + '</span>' +
+        '<span class="meta">' + esc(l.autor) + ' · ' + esc(l.editora) +
+          (l.exemplo ? '<span class="tag-ex">dado de exemplo</span>' : '') + '</span>' +
+        '<span class="row"><span class="badge ' + (ok ? 'ok' : 'warn') + '">' + esc(l.status) + '</span>' +
+          '<span class="loc">' + esc(l.biblioteca) + '</span></span>' +
+        '<span class="chev" aria-hidden="true"></span>' +
+      '</button></h3>' +
+      '<div id="d' + l.id + '" class="details" hidden>' +
+        '<dl>' + row("Autor", l.autor) + row("Editora", l.editora) + row("Assunto", l.assunto) +
+          row("Coleção", l.colecao) + row("Biblioteca", l.biblioteca) + row("Localização", l.localizacao) +
+          statusRows + '</dl>' +
+        '<details class="tech"><summary>Dados técnicos do acervo</summary><dl>' +
+          row("Nº de registro (tombo)", l.tombo) + row("Classificação", l.classificacao) +
+          row("Identificação", l.identificacao) + row("Volume", l.volume) +
+          row("Tomo", l.tomo) + row("Exemplar", l.exemplar) + '</dl></details>' +
+      '</div></article></li>';
+  }
+
+  function render() {
+    var total = state.matches.length;
+    var items = state.matches.slice(0, state.shown);
+    var openIds = Array.prototype.map.call(
+      list.querySelectorAll('.card-toggle[aria-expanded="true"]'),
+      function (b) { return b.getAttribute("aria-controls"); });
+    list.innerHTML = items.map(card).join("");
+    openIds.forEach(function (id) {
+      var panel = document.getElementById(id);
+      if (!panel) return;
+      panel.hidden = false;
+      list.querySelector('[aria-controls="' + id + '"]').setAttribute("aria-expanded", "true");
+    });
+
+    var where = state.bib === "todas" ? "em todas as bibliotecas" : "na biblioteca " + state.bib;
+    if (total === 0) {
+      summary.className = "empty";
+      summary.textContent = "Nenhum livro encontrado para “" + state.q + "” " + where +
+        ". Tente outra palavra, outro campo em “Buscar por” ou escolha “Todas” as bibliotecas.";
+    } else {
+      summary.className = "";
+      summary.textContent = total + (total === 1 ? " resultado" : " resultados") + " para “" + state.q + "” " + where +
+        ". Mostrando " + items.length + " de " + total + ".";
+    }
+
+    var left = total - items.length;
+    if (left > 0) {
+      moreBtn.hidden = false;
+      moreBtn.textContent = "Mostrar mais resultados (" + left + (left === 1 ? " restante)" : " restantes)");
+    } else {
+      moreBtn.hidden = true;
+    }
+  }
+
+  function search() {
+    var q = qInput.value.trim();
+    if (!q) {
+      qInput.setAttribute("aria-invalid", "true");
+      qError.hidden = false;
+      qError.textContent = "Digite ao menos uma palavra para pesquisar.";
+      qInput.focus();
+      return;
+    }
+    qInput.removeAttribute("aria-invalid");
+    qError.hidden = true;
+
+    state.q = q;
+    state.campo = form.elements.campo.value;
+    state.bib = bibSel.value;
+    var nq = norm(q);
+    state.matches = LIVROS.filter(function (l) {
+      var okBib = state.bib === "todas" || l.biblioteca === state.bib;
+      return okBib && norm(l[state.campo]).indexOf(nq) !== -1;
+    });
+    state.shown = Math.min(PAGE, state.matches.length);
+    list.innerHTML = ""; // nova pesquisa: limpa a lista e fecha os detalhes abertos
+    render();
+    goToResults();
+  }
+
+  function goToResults() {
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    summary.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    summary.focus({ preventScroll: true });
+  }
+
+  // A busca não depende do envio do formulário (alguns visualizadores o bloqueiam).
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+  document.getElementById("go").addEventListener("click", search);
+  qInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); search(); }
+  });
+
+  document.querySelectorAll(".chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      qInput.value = b.getAttribute("data-q");
+      form.elements.campo.value = "titulo";
+      search();
+    });
+  });
+
+  moreBtn.addEventListener("click", function () {
+    state.shown = Math.min(state.shown + PAGE, state.matches.length);
+    render();
+  });
+
+  list.addEventListener("click", function (e) {
+    var btn = e.target.closest(".card-toggle");
+    if (!btn) return;
+    var panel = document.getElementById(btn.getAttribute("aria-controls"));
+    var open = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", open ? "false" : "true");
+    panel.hidden = open;
+  });
+</script>
+</body>
+</html>
